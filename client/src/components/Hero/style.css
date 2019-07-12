@@ -1,0 +1,15 @@
+.jumbotron {
+  margin-top: 40px;
+  width: 90%;
+  margin-right: 5%;
+  margin-left: 5%;
+  text-align: center;
+  background-color: #f8f9fa;
+}
+
+h1 {
+  font-size: 80px;
+}
+#introParagraph {
+  font-size: 30px;
+}

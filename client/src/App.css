@@ -1,0 +1,15 @@
+.displayCard {
+  border: 2px solid #202528;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  padding: 15px 0px;
+}
+
+img {
+  text-align: center;
+  padding: 50%;
+}
+
+.cardBtn {
+  margin: 15px 10px 0 0;
+}
