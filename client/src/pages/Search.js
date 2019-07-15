@@ -3,13 +3,19 @@ import Hero from "../components/Hero";
 import { Card, LearnBtn, FavoriteBtn, CardImg } from "../components/Card";
 import { SearchBar, SearchBtn } from "../components/SearchBar";
 import { Row, Column } from "../components/Bootstrap";
+import { EmailModal, ConfirmModal } from "../components/Modal";
 import API from "../utils/API";
 import '../App.css';
 
 class Search extends Component {
     state = {
-        title: 'Blink',
-        books: []
+        title: 'Harry Potter',
+        books: [],
+        bookToSave: {},
+        emailModal: false,
+        confirmModal: false,
+        modalText: "",
+        email: '',
     };
 
     componentDidMount() {
@@ -32,28 +38,66 @@ class Search extends Component {
         API.searchBooks(this.state.title)
             .then(res => {
                 this.setState({ books: res.data.items });
-                console.log(this.state.books)
             }).catch(err => console.log(err))
     }
 
-    saveBook = (e, book) => {
+    handleFaveBtnClick = (e, book) => {
         e.preventDefault();
-        console.log(book);
         book = book.volumeInfo;
-        API.saveBook({
-            title: book.title,
-            author: book.authors,
-            description: book.description,
-            image: book.imageLinks.thumbnail,
-            url: book.infoLink
-        }).then(res => this.loadBooks())
-            .catch(err => console.log(err));
-    }
+        this.setState({
+            bookToSave: {
+                title: book.title,
+                author: book.authors,
+                description: book.description,
+                image: book.imageLinks.thumbnail,
+                url: book.infoLink,
+                email: ''
+            }
+        });
 
+        this.openEmailModal();
+    }
 
     learnMore = (e) => {
         e.preventDefault();
     }
+
+    openEmailModal = () => {
+        this.setState({ emailModal: true, modalText: `Enter your email address to add to your favorites` });
+    }
+
+    openConfirmModal = () => {
+        let email = this.state.email.replace(/[^a-zA-Z0-9]/g, '')
+        this.setState(prevState => ({
+            bookToSave: {
+                ...prevState.bookToSave,
+                email: email
+            }
+        }))
+        this.setState({ confirmModal: true, emailModal: false, modalText: `Your Favorite has been Saved!` });
+    }
+
+
+    closeModal = () => {
+        this.setState({ confirmModal: false, modalText: ``, email: false });
+        this.saveBook();
+    }
+
+    saveBook = () => {
+        let book = this.state.bookToSave;
+        API.saveBook({
+            title: book.title,
+            author: book.author,
+            description: book.description,
+            image: book.image,
+            url: book.url,
+            email: book.email
+        })
+            .then(res => {
+                console.log("book saved!")
+            })
+            .catch(err => console.log(err));
+    };
 
     render() {
         return (
@@ -61,20 +105,24 @@ class Search extends Component {
                 <Hero title="Google Bookstore" subtitle="Search for and Save Books of Interest" />
                 <form className="col-10 offset-1" onSubmit={(e) => this.handleSearch(e)}>
                     <SearchBar
+                        label="Search for your favorite books"
                         onChange={this.handleInputChange}
                         name="title"
                         type="text"
+                        placeholder='i.e. "Harry Potter"'
                     />
                     <SearchBtn type="submit" />
                 </form>
                 {this.state.books.length ? (
                     <div>
-                        {this.state.books.map(book => (
-                            <Row addclass="displayCard" size="10" offsetSize="1" key={book.volumeInfo.id}>
+                        {this.state.books.map((book, index) => (
+                            <Row addclass="displayCard" size="10" key={index} offsetSize="1">
                                 <Column size="8" key={book.volumeInfo.id}>
                                     <Card key={book.volumeInfo.id} bookInfo={book.volumeInfo} />
-                                    <a href={book.volumeInfo.infoLink} target="_blank" rel="noopener noreferrer"><LearnBtn addclass="cardBtn" /></a>
-                                    <FavoriteBtn addclass="cardBtn" onClick={(e) => this.saveBook(e, book)} />
+                                    <a key={book.volumeInfo.id} href={book.volumeInfo.infoLink} target="_blank" rel="noopener noreferrer"><LearnBtn addclass="cardBtn" /></a>
+                                    <FavoriteBtn key={book.volumeInfo.id} addclass="cardBtn" onClick={(e) => this.handleFaveBtnClick(e, book)} />
+                                    <EmailModal key={book.volumeInfo.id} handleInputChange={this.handleInputChange} isOpen={this.state.emailModal} modalText={this.state.modalText} openConfirmModal={this.openConfirmModal} />
+                                    <ConfirmModal key={book.volumeInfo.id} isOpen={this.state.confirmModal} modalText={this.state.modalText} closeModal={this.closeModal} />
                                 </Column>
                                 <Column size="2" key={book.volumeInfo.id}>
                                     <CardImg key={book.volumeInfo.id} bookInfo={book.volumeInfo} />

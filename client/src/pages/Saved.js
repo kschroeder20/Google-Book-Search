@@ -2,52 +2,71 @@ import React, { Component } from 'react';
 import Hero from "../components/Hero";
 import { Card, CardImg, RemoveFavoriteBtn } from "../components/Favorites";
 import { Row, Column } from "../components/Bootstrap";
+import { SearchBar, SearchBtn } from "../components/SearchBar";
 import API from "../utils/API";
 import '../App.css';
 
 
 class Saved extends Component {
     state = {
-        books: []
+        books: [],
+        email: ""
     };
 
     componentDidMount() {
+        //this.loadBooks();
+    }
+
+    handleInputChange = (e) => {
+        const { name, value } = e.target;
+        this.setState({
+            [name]: value
+        });
+    }
+
+    handleSearch = (e) => {
+        e.preventDefault();
         this.loadBooks();
     }
 
     removeBook = (e, book) => {
-
         e.preventDefault();
-        console.log(book);
         const id = book._id;
 
         API.deleteBook(id)
             .then(res => {
                 console.log("Removed successfully");
-                this.loadBooks()
+                this.loadBooks();
             })
             .catch(err => console.log(err));
-
-        // console.log("here");
-        // this.setState({ state: this.state });
     }
 
     loadBooks = () => {
-        API.getBooks()
+        API.getBookByEmail(this.state.email)
             .then(res => {
                 this.setState({ books: res.data });
-                console.log(res);
-            }).catch(err => console.log(err));
+            })
+            .catch(err => console.log(err));
     }
 
     render() {
         return (
             <div>
                 <Hero title="My Favorites" subtitle="" />
+                <form className="col-10 offset-1" onSubmit={(e) => this.handleSearch(e)}>
+                    <SearchBar
+                        label="Search your email to see your favorites"
+                        onChange={this.handleInputChange}
+                        name="email"
+                        type="email"
+                        placholder="Enter your email"
+                    />
+                    <SearchBtn type="submit" />
+                </form>
                 {this.state.books.length ? (
                     <div>
                         {this.state.books.map(book => (
-                            <Row addclass="displayCard" size="10" offsetSize="1">
+                            <Row addclass="displayCard" size="10" key={book._id} offsetSize="1">
                                 <Column size="8">
                                     <Card key={book._id} bookInfo={book} />
                                     <RemoveFavoriteBtn addclass="cardBtn" onClick={(e) => this.removeBook(e, book)} />
@@ -60,7 +79,7 @@ class Saved extends Component {
                     </div>
 
                 ) : <div className="col-10 offset-1" >
-                        <h3 className="noBooks">No Favorites to Display</h3>
+                        <h5 className="noBooks">No favorites to display</h5>
                     </div>}
             </div>
         );

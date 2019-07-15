@@ -4,8 +4,8 @@ import "./style.css";
 export function SearchBar(props) {
     return (
         <div className="form-group">
-            <label>Search by Book Title</label>
-            <input {...props} className="form-control" id="formGroupExampleInput" placeholder="Title (required)" />
+            <label>{props.label}</label>
+            <input {...props} className="form-control" id="formGroupExampleInput" placeholder={props.placeholder} />
         </div>
     )
 }

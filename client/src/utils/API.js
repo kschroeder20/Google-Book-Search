@@ -7,11 +7,13 @@ export default {
     searchBooks: (query) => {
         return axios.get(`https://www.googleapis.com/books/v1/volumes?q=${query}`)
     },
-    getBookById: (id) => {
-        return axios.get(`/api/books/${id}`)
+    getBookByEmail: (email) => {
+        email = email.replace(/[^a-zA-Z0-9]/g, '');
+        return axios.get(`/api/books/${email}`)
     },
-    saveBook: (savedBook) => {
-        return axios.post(`/api/books/${savedBook}`)
+    // Saves a book to the database
+    saveBook: (bookData) => {
+        return axios.post("/api/books", bookData);
     },
     deleteBook: (id) => {
         return axios.delete(`/api/books/${id}`)
