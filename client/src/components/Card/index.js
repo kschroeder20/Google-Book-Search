@@ -22,7 +22,7 @@ export function Card(props) {
 export function CardImg(props) {
     return (
         <div>
-            <img src={props.bookInfo.imageLinks.thumbnail} alt={props.bookInfo.title} />
+            {props.bookInfo.imageLinks !== undefined ? <img src={props.bookInfo.imageLinks.thumbnail} alt={props.bookInfo.title} /> : ''}
         </div>
     )
 }
