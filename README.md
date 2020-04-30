@@ -15,3 +15,7 @@ In this activity, we create a new React-based Google Books Search app. This app 
 * Bootstrap
 * Express/Node.js
 * MongoDB/Mongoose
+
+## Future Developments
+* Update styling
+* Authentication
